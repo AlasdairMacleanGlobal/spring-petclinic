@@ -81,6 +81,12 @@ class ClinicServiceTests {
 	Pageable pageable;
 
 	@Test
+	void shouldFindAllByNameStartingWith() {
+		this.vets.findAllByFirstNameStartingWith("Peter");
+		this.vets.findAllByFirstNameStartingWith("Peter");
+	}
+
+	@Test
 	void shouldFindOwnersByLastName() {
 		Page<Owner> owners = this.owners.findByLastName("Davis", pageable);
 		assertThat(owners).hasSize(2);
