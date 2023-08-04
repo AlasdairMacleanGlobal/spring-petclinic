@@ -29,10 +29,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.samples.petclinic.vet.VetRepository;
+import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class PetClinicIntegrationTests {
+
+	@Autowired private WebTestClient webTestClient;
 
 	@LocalServerPort
 	int port;
@@ -54,6 +57,17 @@ public class PetClinicIntegrationTests {
 		RestTemplate template = builder.rootUri("http://localhost:" + port).build();
 		ResponseEntity<String> result = template.exchange(RequestEntity.get("/owners/1").build(), String.class);
 		assertThat(result.getStatusCode()).isEqualTo(HttpStatus.OK);
+	}
+
+	@Test
+	void testOwnerDetailsWebTestClient() {
+		final var padding = "x".repeat(5_000); // larger than AbstractHttp11Protocol.maxSavePostSize() (defaults to 4 * 1024)
+		webTestClient.post()
+			.uri("/owners/new")
+			.bodyValue("{\"padding\":\"" + padding + "\",\"lastName\":\"Smith\"}")
+			.exchange()
+			.expectStatus()
+			.isEqualTo(200);
 	}
 
 	public static void main(String[] args) {
